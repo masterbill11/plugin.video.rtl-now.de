@@ -108,7 +108,7 @@ def showLibrary():
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
 
-def _listEpisodes(episodes, format_id, func={}):
+def _listEpisodes(episodes, format_id, func={}, break_at_none_free_episode=True):
     xbmcplugin.setContent(bromixbmc.Addon.Handle, 'episodes')
     
     episodes = episodes.get('content', {})
@@ -165,13 +165,15 @@ def _listEpisodes(episodes, format_id, func={}):
                           'id': id}
                 bromixbmc.addVideoLink(title, params=params, thumbnailImage=thumbnailImage, fanart=fanart, additionalInfoLabels=additionalInfoLabels)
                 show_next = True
+            elif free=='0':
+                show_next = False
                 
     if page<maxpage and show_next:
         params = {'action': __ACTION_SHOW_EPISODES__,
                   'id': format_id,
                   'page': str(page+1)
                   }
-        bromixbmc.addDir(bromixbmc.Addon.localize(30009), params=params, fanart=__FANART__)
+        bromixbmc.addDir(bromixbmc.Addon.localize(30009)+' ('+str(page+1)+')', params=params, fanart=__FANART__)
         pass
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
