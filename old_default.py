@@ -35,71 +35,6 @@ __ACTION_PLAY__ = 'play'
 __SETTING_SHOW_FANART__ = __plugin__.getSettingAsBool('showFanart')
 __SETTING_SHOW_PUCLICATION_DATE__ = __plugin__.getSettingAsBool('showPublicationDate')
 
-def showIndex():
-    if len(__plugin__.getFavorites())>0:
-        params = {'action': __ACTION_SHOW_FAVS__}
-        __plugin__.addDirectory("[B]"+__plugin__.localize(30008)+"[/B]", params = params, thumbnailImage=__ICON_FAVOURITES__, fanart=__FANART__)
-        
-    # add 'Sendungen A-Z'
-    params = {'action': __ACTION_SHOW_LIBRARY__}
-    __plugin__.addDirectory(__plugin__.localize(30000), params = params, thumbnailImage=__ICON_LIBRARY__, fanart=__FANART__)
-    
-    params = {'action': __ACTION_SHOW_NEWEST__}
-    __plugin__.addDirectory(__plugin__.localize(30002), params = params, thumbnailImage=__ICON_NEWEST__, fanart=__FANART__)
-    
-    params = {'action': __ACTION_SHOW_TIPS__}
-    __plugin__.addDirectory(__plugin__.localize(30001), params = params, thumbnailImage=__ICON_HIGHLIGHTS__, fanart=__FANART__)
-    
-    params = {'action': __ACTION_SHOW_TOP10__}
-    __plugin__.addDirectory(__plugin__.localize(30003), params = params, thumbnailImage=__ICON_HIGHLIGHTS__, fanart=__FANART__)
-    
-    params = {'action': __ACTION_SEARCH__}
-    __plugin__.addDirectory(__plugin__.localize(30004), params = params, thumbnailImage=__ICON_SEARCH__, fanart=__FANART__)
-    
-    """
-    The live stream is not working at the moment - so we deactivate the live stream for the moment
-    
-    params = {'action': __ACTION_LIVE_STREAM__}
-    __plugin__.addVideoLink(__plugin__.localize(30005), params = params, thumbnailImage=__ICON_LIVE__, fanart=__FANART__)
-    """
-    
-    __plugin__.endOfDirectory()
-
-def showLibrary():
-    __plugin__.addSortMethod()
-    
-    shows = __now_client__.getShows()
-    shows = shows.get('content', {})
-    shows = shows.get('formatlist', {})
-    
-    for key, show in shows.items():
-        title = show.get('formatlong', None)
-        id = show.get('formatid', None)
-        free_episodes = int(show.get('free_episodes', '0'))
-        fanart = None
-        if __SETTING_SHOW_FANART__:
-            fanart = show.get('bigaufmacherimg', '')
-            fanart = fanart.replace('/640x360/', '/768x432/')
-            
-        thumbnailImage = show.get('biggalerieimg', '')
-        thumbnailImage = thumbnailImage.replace('/271x152/', '/768x432/')
-        
-        if free_episodes>=1 and title!=None and id!=None:
-            params = {'action': __ACTION_SHOW_EPISODES__,
-                      'id': id}
-            
-            contextParams = {'action': __ACTION_ADD_FAV__,
-                             'id': id,
-                             'title': title.encode('utf-8'),
-                             'fanart': fanart,
-                             'thumb': thumbnailImage}
-            contextRun = 'RunPlugin('+__plugin__.createUrl(contextParams)+')'
-            contextMenu = [("[B]"+__plugin__.localize(30006)+"[/B]", contextRun)]
-            
-            __plugin__.addDirectory(title, params=params, thumbnailImage=thumbnailImage, fanart=fanart, contextMenu=contextMenu)
-    
-    __plugin__.endOfDirectory()
-
 def _listEpisodes(episodes, format_id, func={}, break_at_none_free_episode=True):
     __plugin__.setContent('episodes')
     
@@ -208,21 +143,6 @@ def showTop10():
                                   'title_func': _get_title}
                   )
 
-def showEpisodes(id):
-    def _sort_key(d):
-        return d[1].get('sendestart', '').lower()
-    
-    def _get_title(d):
-        return d.get('headlinelong', '')
-    
-    page = bromixbmc.getParam('page', '1')
-    
-    episodes = __now_client__.getEpisodes(id, page=page)
-    _listEpisodes(episodes, id, func={'sort_func': _sort_key,
-                                  'sort_reverse': True,
-                                  'title_func': _get_title}
-                  )
-    
 def search():
     success = False
     
