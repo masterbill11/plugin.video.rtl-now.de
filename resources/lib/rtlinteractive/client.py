@@ -5,6 +5,8 @@ import time
 import requests
 # Verify is disabled and to avoid warnings we disable the warnings. Behind a proxy request isn't working correctly all
 # the time and if so can't validate the hosts correctly resulting in a exception and the addon won't work properly.
+from resources.lib.kodion.utils.methods import find_best_fit
+
 try:
     from requests.packages import urllib3
 
@@ -64,6 +66,10 @@ class Client(object):
 
     def get_config(self):
         return self._config
+
+    def get_film_details(self, film_id):
+        params = {'filmid': film_id}
+        return self._perform_request(path='/api/query/json/content.film_details', params=params)
 
     def get_films(self, format_id, page=1):
         params = {'userid': '0',
