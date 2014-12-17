@@ -1,4 +1,5 @@
 import re
+from resources.lib.kodion.utils import FunctionCache
 
 __author__ = 'bromix'
 
@@ -50,7 +51,7 @@ class Provider(kodion.AbstractProvider):
             title = film['headlinelong']
             if show_format_title:
                 format_title = film['formatlong']
-                title = format_title+' - '+title
+                title = format_title + ' - ' + title
                 pass
 
             film_item = VideoItem(title,
@@ -92,14 +93,14 @@ class Provider(kodion.AbstractProvider):
             result_films.append(film_item)
             pass
         if sort:
-            result_films = sorted(result_films,key=_sort_newest, reverse=True)
+            result_films = sorted(result_films, key=_sort_newest, reverse=True)
             pass
         result.extend(result_films)
 
         if page < max_page:
             new_params = {}
             new_params.update(context.get_params())
-            new_params['page'] = page+1
+            new_params['page'] = page + 1
             next_page_item = kodion.items.create_next_page_item(context, page)
             next_page_item.set_fanart(self.get_fanart(context))
             result.append(next_page_item)
@@ -112,7 +113,8 @@ class Provider(kodion.AbstractProvider):
         result = []
         format_id = re_match.group('format_id')
         page = int(context.get_param('page', 1))
-        json_data = self.get_client(context).get_films(format_id=format_id, page=page)
+        json_data = context.get_function_cache().get(FunctionCache.ONE_HOUR/2, self.get_client(context).get_films,
+                                                     format_id=format_id, page=page)
         result.extend(self._list_films(context, re_match, json_data))
 
         return result
@@ -120,21 +122,21 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/newest/$')
     def _on_newest(self, context, re_match):
         result = []
-        json_data = self.get_client(context).get_newest()
+        json_data = context.get_function_cache().get(FunctionCache.ONE_HOUR/2, self.get_client(context).get_newest)
         result.extend(self._list_films(context, re_match, json_data, show_format_title=True))
         return result
 
     @kodion.RegisterProviderPath('^/tips/$')
     def _on_tips(self, context, re_match):
         result = []
-        json_data = self.get_client(context).get_tips()
+        json_data = context.get_function_cache().get(FunctionCache.ONE_HOUR/2, self.get_client(context).get_tips)
         result.extend(self._list_films(context, re_match, json_data, show_format_title=True, sort=False))
         return result
 
     @kodion.RegisterProviderPath('^/top10/$')
     def _on_top10(self, context, re_match):
         result = []
-        json_data = self.get_client(context).get_top_10()
+        json_data = context.get_function_cache().get(FunctionCache.ONE_HOUR/2, self.get_client(context).get_top_10)
         result.extend(self._list_films(context, re_match, json_data, show_format_title=True, sort=False))
         return result
 
@@ -145,7 +147,7 @@ class Provider(kodion.AbstractProvider):
 
         result = []
 
-        json_data = self.get_client(context).get_formats()
+        json_data = context.get_function_cache().get(FunctionCache.ONE_HOUR, self.get_client(context).get_formats)
         format_list = json_data.get('result', {}).get('content', {}).get('formatlist')
         for key in format_list:
             now_format = format_list[key]
