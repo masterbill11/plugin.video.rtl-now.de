@@ -179,6 +179,18 @@ class Provider(kodion.AbstractProvider):
     def on_search(self, search_text, context, re_match):
         result = []
 
+        json_data = self.get_client(context).search(search_text)
+        list = json_data.get('result', {}).get('content', {}).get('list', {})
+        for key in list:
+            item = list[key]
+            title = item['result']
+            format_id = item['formatid']
+            search_item = DirectoryItem(title,
+                                        context.create_uri(['format', format_id]))
+            search_item.set_fanart(self.get_fanart(context))
+            result.append(search_item)
+            pass
+
         return result
 
     def on_root(self, context, re_match):
