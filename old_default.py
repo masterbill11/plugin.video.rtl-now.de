@@ -262,78 +262,7 @@ def playLivestream():
     if url!=None:
         __plugin__.setResolvedUrl(url, isLiveStream=True)
 
-def removeFav(id):
-    __plugin__.removeFavorite(id)
-    bromixbmc.executebuiltin("Container.Refresh");
-    pass
-
-def addFav(id):
-    title = bromixbmc.getParam('title', '').decode('utf-8')
-    fanart = bromixbmc.getParam('fanart', '')
-    thumbnailImage = bromixbmc.getParam('thumb', '')
-    
-    if id!=None and title!='':
-        newFav = {}
-        newFav['title'] = title
-        newFav['fanart'] = fanart
-        newFav['thumbnailImage'] = thumbnailImage
-        
-        __plugin__.setFavorite(id, newFav)
-    pass
-
-def showFavs():
-    def _sort_key(d):
-        return d[1].get('title', "")
-    
-    _favs = __plugin__.getFavorites()
-    favs = sorted(_favs, key=_sort_key, reverse=False)
-    
-    for fav in favs:
-        if len(fav)==2:
-            item = fav[1]
-            params = {'action': __ACTION_SHOW_EPISODES__,
-                      'id': fav[0]}
-            title = item.get('title', None)
-            if title!=None:
-                contextParams = {'action': __ACTION_REMOVE_FAV__,
-                                 'id': fav[0]
-                                 }
-                contextRun = 'RunPlugin('+__plugin__.createUrl(contextParams)+')'
-                contextMenu = [("[B]"+__plugin__.localize(30007)+"[/B]", contextRun)]
-                
-                __plugin__.addDirectory(title, params=params, thumbnailImage=item.get('thumbnailImage', ''), fanart=item.get('fanart', ''), contextMenu=contextMenu)
-                
-    __plugin__.endOfDirectory()
-
 def play(id):
     url = __now_client__.getEpisodeVideoUrl(id)
     if url!=None:
-        __plugin__.setResolvedUrl(url) 
-
-action = bromixbmc.getParam('action')
-id = bromixbmc.getParam('id')
-
-if action == __ACTION_SHOW_LIBRARY__:
-    showLibrary()
-elif action == __ACTION_SHOW_TIPS__:
-    showTips()
-elif action == __ACTION_SHOW_NEWEST__:
-    showNewest()
-elif action == __ACTION_SHOW_TOP10__:
-    showTop10()
-elif action == __ACTION_SHOW_EPISODES__ and id!=None:
-    showEpisodes(id)
-elif action == __ACTION_SEARCH__:
-    search()
-elif action == __ACTION_LIVE_STREAM__:
-    playLivestream()
-elif action == __ACTION_SHOW_FAVS__:
-    showFavs()
-elif action == __ACTION_ADD_FAV__ and id!=None:
-    addFav(id)
-elif action == __ACTION_REMOVE_FAV__ and id!=None:
-    removeFav(id)
-elif action == __ACTION_PLAY__ and id!=None:
-    play(id)
-else:
-    showIndex()
+        __plugin__.setResolvedUrl(url)
