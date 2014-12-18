@@ -45,9 +45,15 @@ class Provider(kodion.AbstractProvider):
         film_list = content['filmlist']
 
         result_films = []
+        add_next_page_item = True
         keys = sorted(film_list.keys())
         for key in keys:
             film = film_list[key]
+            free = str(film.get('free', '0'))
+            if free == '0':
+                add_next_page_item = False
+                break
+
             title = film['headlinelong']
             if show_format_title:
                 format_title = film['formatlong']
@@ -97,7 +103,7 @@ class Provider(kodion.AbstractProvider):
             pass
         result.extend(result_films)
 
-        if page < max_page:
+        if add_next_page_item and page < max_page:
             new_params = {}
             new_params.update(context.get_params())
             new_params['page'] = page + 1
