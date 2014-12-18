@@ -55,6 +55,9 @@ class Provider(kodion.AbstractProvider):
                 add_next_page_item = False
                 pass
 
+            if free == '0':
+                continue
+
             title = film['headlinelong']
             if show_format_title:
                 format_title = film['formatlong']
