@@ -50,12 +50,12 @@ class Provider(kodion.AbstractProvider):
         keys = sorted(film_list.keys())
         for key in keys:
             film = film_list[key]
+
+            # as soon as we find non-free episodes we don't provide pagination
+            # the 'continue' should skip all non-free episodes
             free = str(film.get('free', '0'))
             if free == '0':
                 add_next_page_item = False
-                pass
-
-            if free == '0':
                 continue
 
             title = film['headlinelong']
