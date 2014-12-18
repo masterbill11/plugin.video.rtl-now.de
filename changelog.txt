@@ -2,7 +2,7 @@
 ADD: Watch Later
 ADD: search + history
 ADD: caching
-FIX: playing HDS rtmpte streams
+FIX: playing HDS streams
 UPD: moved to kodion framework
 
 1.0.3 (2014-08-31)
