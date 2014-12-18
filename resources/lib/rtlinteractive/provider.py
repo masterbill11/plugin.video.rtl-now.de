@@ -55,7 +55,7 @@ class Provider(kodion.AbstractProvider):
                 pass
 
             film_item = VideoItem(title,
-                                  context.create_uri(['play'], {'video_id': 'AAA'}))
+                                  context.create_uri(['play'], {'video_id': film['id']}))
 
             # set image
             image = film['biggalerieimg']
@@ -107,6 +107,17 @@ class Provider(kodion.AbstractProvider):
             pass
 
         return result
+
+    @kodion.RegisterProviderPath('^/play/$')
+    def _on_play(self, context, re_match):
+        video_id = context.get_param('video_id', '')
+        if video_id:
+            streams = self.get_client(context).get_film_streams(video_id)
+            video_item = VideoItem(video_id,
+                                   streams[0])
+            return video_item
+
+        return False
 
     @kodion.RegisterProviderPath('^/format/(?P<format_id>\d+)/$')
     def _on_format(self, context, re_match):

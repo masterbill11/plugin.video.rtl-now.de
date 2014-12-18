@@ -1,3 +1,6 @@
+import urlparse
+
+
 def getEpisodeVideoUrl(self, id):
     finalUrl = None
     film = self.getEpisodeDetails(id)
@@ -32,3 +35,9 @@ def getEpisodeVideoUrl(self, id):
             finalUrl = "rtmpe://fms-fra"+str(random.randint(1, 34))+".rtl.de/"+matchHDS[0][2]+"/ playpath=mp4:"+matchHDS[0][4].replace(".f4m", "")+" swfVfy=1 swfUrl=http://"+hosterURL+"/includes/vodplayer.swf app="+matchHDS[0][2]+"/_definst_ tcUrl=rtmpe://fms-fra"+str(random.randint(1, 34))+".rtl.de/"+matchHDS[0][2]+"/ pageUrl="+videoUrl
 
     return finalUrl
+
+
+url_comps = urlparse.urlparse('http://rtl-now.rtl.de/rtl-aktuell/thema-ua-erbschaftssteuer.php?film_id=183085&player=1&season=0')
+url = '%s://%s/%s' % (url_comps.scheme, url_comps.hostname, url_comps.path)
+query = dict(urlparse.parse_qsl(url_comps.query))
+x=0

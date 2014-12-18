@@ -5,6 +5,23 @@ from resources.lib import rtlinteractive
 
 
 class TestClient(unittest.TestCase):
+    def test_get_film_streams(self):
+        client = rtlinteractive.Client(rtlinteractive.Client.CONFIG_RTL_NOW)
+        streams = client.get_film_streams(182367)
+        pass
+
+    def test_get_film_details(self):
+        client = rtlinteractive.Client(rtlinteractive.Client.CONFIG_RTL_NOW)
+        json_data = client.get_film_details(183085)
+        self.assertTrue(json_data['success'])
+        pass
+
+    def test_get_live_streams(self):
+        client = rtlinteractive.Client(rtlinteractive.Client.CONFIG_RTL_NOW)
+        json_data = client.get_live_streams()
+        self.assertTrue(json_data['success'])
+        pass
+
     def test_get_films(self):
         client = rtlinteractive.Client(rtlinteractive.Client.CONFIG_RTL_NOW)
         json_data = client.get_films(format_id=1061, page=1)

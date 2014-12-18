@@ -1,11 +1,14 @@
 import hashlib
+import json
+import re
 import uuid
 import time
+from xml.etree import ElementTree
 
 import requests
+
 # Verify is disabled and to avoid warnings we disable the warnings. Behind a proxy request isn't working correctly all
 # the time and if so can't validate the hosts correctly resulting in a exception and the addon won't work properly.
-from resources.lib.kodion.utils.methods import find_best_fit
 
 try:
     from requests.packages import urllib3
@@ -23,6 +26,7 @@ class Client(object):
                       'key_tablet': '56f63897-89aa-44f9-8f70-f0052050fe59',
                       'url': 'https://rtl-now.rtl.de/',
                       'id': '9',
+                      'rtmpe': 'rtmpe://fms-fra%d.rtl.de/rtlnow/',
                       'episode-thumbnail-url': 'http://autoimg.rtl.de/rtlnow/%PIC_ID%/660x660/formatimage.jpg',
                       'http-header': {'X-App-Name': 'RTL NOW App',
                                       'X-Device-Type': 'rtlnow_android',
@@ -67,8 +71,67 @@ class Client(object):
     def get_config(self):
         return self._config
 
+    def get_film_streams(self, film_id):
+        result = []
+
+        def _browse(_url):
+            headers = {'Connection': 'keep-alive',
+                       'Cache-Control': 'max-age=0',
+                       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                       'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.38 Safari/537.36',
+                       'DNT': '1',
+                       'Accept-Encoding': 'gzip, deflate, sdch',
+                       'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
+
+            result = requests.get(_url, headers=headers, verify=False)
+            return result.text
+
+        def _get_xml(_xml_url):
+            xml = _browse(_xml_url)
+            return ElementTree.fromstring(xml.encode('utf-8'))
+
+        def _get_data_from_html(_video_url):
+            html = _browse(_video_url)
+            re_match = re.search(r'PlayerWatchdog.init\((?P<data>[^\)]+)', html)
+            if re_match:
+                video_data = re_match.group('data').replace('\'', '"')
+                return json.loads(video_data)
+            return {}
+
+        json_data = self.get_film_details(film_id)
+        film = json_data.get('result', {}).get('content', {}).get('film', {})
+        video_url = str(film.get('videourl', ''))
+        if video_url:
+            video_data = _get_data_from_html(video_url)
+            player_data = video_data['playerdata']
+            player_url = video_data['playerurl']
+
+            xml = _get_xml(player_data)
+            video_info = xml.find('./playlist/videoinfo')
+            for filename in video_info.findall('filename'):
+                rtmpe_match = re.search(r'(?P<url>rtmpe://(?:[^/]+/){2})(?P<play_path>.+)', filename.text)
+                hds_match = re.search(r'http://hds.+/(?P<play_path>\d+/.+)', filename.text)
+                if rtmpe_match:
+                    play_path = 'mp4:' + rtmpe_match.group('play_path')
+                    url = '%s playpath=%s swfVfy=1 swfUrl=%s pageUrl=%s' % (
+                        filename.text, play_path, player_url, video_url)
+                    result.append(url)
+                    pass
+                elif hds_match:
+                    play_path = hds_match.group('play_path').replace('.f4m', '')
+                    rtmpe = self._config['rtmpe'] % 22
+                    url = '%s%s playpath=%s swfVfy=1 swfUrl=%s pageUrl=%s' % (rtmpe, play_path, 'mp4:'+play_path, player_url, video_url)
+                    result.append(url)
+                    pass
+                else:
+                    result.append(filename.text)
+                pass
+            pass
+
+        return result
+
     def get_film_details(self, film_id):
-        params = {'filmid': film_id}
+        params = {'filmid': str(film_id)}
         return self._perform_request(path='/api/query/json/content.film_details', params=params)
 
     def get_films(self, format_id, page=1):
