@@ -249,21 +249,21 @@ class Provider(kodion.AbstractProvider):
         # newest
         newest_item = DirectoryItem(context.localize(self.LOCAL_MAP['now.newest']),
                                     context.create_uri(['newest']),
-                                    image=context.create_resource_path('media', 'library.png'))
+                                    image=context.create_resource_path('media', 'newest.png'))
         newest_item.set_fanart(self.get_fanart(context))
         result.append(newest_item)
 
         # tips
         tips_item = DirectoryItem(context.localize(self.LOCAL_MAP['now.tips']),
                                   context.create_uri(['tips']),
-                                  image=context.create_resource_path('media', 'library.png'))
+                                  image=context.create_resource_path('media', 'tips.png'))
         tips_item.set_fanart(self.get_fanart(context))
         result.append(tips_item)
 
         # top 10
         top10_item = DirectoryItem(context.localize(self.LOCAL_MAP['now.top10']),
                                    context.create_uri(['top10']),
-                                   image=context.create_resource_path('media', 'library.png'))
+                                   image=context.create_resource_path('media', 'top10.png'))
         top10_item.set_fanart(self.get_fanart(context))
         result.append(top10_item)
 
@@ -273,6 +273,9 @@ class Provider(kodion.AbstractProvider):
         result.append(search_item)
 
         return result
+
+    def get_alternative_fanart(self, context):
+        return self.get_fanart(context)
 
     def get_fanart(self, context):
         return context.create_resource_path('media', 'fanart.jpg')

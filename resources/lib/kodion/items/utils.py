@@ -28,10 +28,14 @@ def create_new_search_item(context):
     return new_search_item
 
 
-def create_search_item(context, alt_name=None, image=u''):
+def create_search_item(context, alt_name=None, image=None):
     name = alt_name
     if not name:
         name = '[B]' + context.localize(constants.localize.SEARCH) + '[/B]'
+        pass
+
+    if image is None:
+        image = context.create_resource_path('media/search.png')
         pass
 
     search_item = DirectoryItem(name,
@@ -41,10 +45,14 @@ def create_search_item(context, alt_name=None, image=u''):
     return search_item
 
 
-def create_favorite_item(context, alt_name=None, image=u''):
+def create_favorite_item(context, alt_name=None, image=None):
     name = alt_name
     if not name:
         name = '[B]' + context.localize(constants.localize.FAVORITES) + '[/B]'
+        pass
+
+    if image is None:
+        image = context.create_resource_path('media/favorites.png')
         pass
 
     favorite_item = DirectoryItem(name,
@@ -54,10 +62,14 @@ def create_favorite_item(context, alt_name=None, image=u''):
     return favorite_item
 
 
-def create_watch_later_item(context, alt_name=None, image=u''):
+def create_watch_later_item(context, alt_name=None, image=None):
     name = alt_name
     if not name:
         name = '[B]' + context.localize(constants.localize.WATCH_LATER) + '[/B]'
+        pass
+
+    if image is None:
+        image = context.create_resource_path('media/watch_later.png')
         pass
 
     watch_later_item = DirectoryItem(name,
