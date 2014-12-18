@@ -23,7 +23,8 @@ class Provider(kodion.AbstractProvider):
     def get_client(self, context):
         if not self._client:
             amount = context.get_settings().get_items_per_page()
-            self._client = Client(Client.CONFIG_RTL_NOW, amount=amount)
+            server_id = context.get_function_cache().get(FunctionCache.ONE_HOUR*6, Client.get_server_id)
+            self._client = Client(Client.CONFIG_RTL_NOW, amount=amount, server_id=server_id)
             pass
 
         return self._client
@@ -52,7 +53,7 @@ class Provider(kodion.AbstractProvider):
             free = str(film.get('free', '0'))
             if free == '0':
                 add_next_page_item = False
-                break
+                pass
 
             title = film['headlinelong']
             if show_format_title:

@@ -5,9 +5,15 @@ from resources.lib import rtlinteractive
 
 
 class TestClient(unittest.TestCase):
+    def test_get_server_id(self):
+        server_id = rtlinteractive.Client.get_server_id()
+        client = rtlinteractive.Client(rtlinteractive.Client.CONFIG_RTL_NOW, server_id=server_id)
+        streams = client.get_film_streams(183331)
+        pass
+
     def test_get_film_streams(self):
         client = rtlinteractive.Client(rtlinteractive.Client.CONFIG_RTL_NOW)
-        streams = client.get_film_streams(182367)
+        streams = client.get_film_streams(183331)
         pass
 
     def test_get_film_details(self):

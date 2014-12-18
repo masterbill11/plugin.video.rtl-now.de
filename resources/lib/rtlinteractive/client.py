@@ -65,10 +65,30 @@ class Client(object):
                                       'Host': 'www.voxnow.de',
                                       'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36'}}
 
-    def __init__(self, config, amount=25):
+    def __init__(self, config, amount=25, server_id=26):
         self._config = config
         self._amount = amount
+        self._server_id = server_id
         pass
+
+    @staticmethod
+    def get_server_id():
+        """
+        For HDS streams we need a valid server id ('fms-fraXX'). We use the show 'RTL Aktuell' of rtlnow.de for all
+        other NOW services (because the use all the same server).
+        :return:
+        """
+        rtl_client = Client(Client.CONFIG_RTL_NOW)
+        streams = rtl_client.get_film_streams(183331)
+        if streams:
+            stream = streams[0]
+            re_match = re.search(r'rtmpe://fms-fra(?P<server_id>\d+).*', stream)
+            if re_match:
+                server_id = int(re_match.group('server_id'))
+                return server_id
+            pass
+
+        return 22
 
     def get_config(self):
         return self._config
@@ -121,7 +141,7 @@ class Client(object):
                     pass
                 elif hds_match:
                     play_path = hds_match.group('play_path').replace('.f4m', '')
-                    rtmpe = self._config['rtmpe'] % 22
+                    rtmpe = self._config['rtmpe'] % self._server_id
                     url = '%s%s playpath=%s swfVfy=1 swfUrl=%s pageUrl=%s' % (rtmpe, play_path, 'mp4:'+play_path, player_url, video_url)
                     result.append(url)
                     pass
