@@ -54,6 +54,19 @@ def create_favorite_item(context, alt_name=None, image=u''):
     return favorite_item
 
 
+def create_watch_later_item(context, alt_name=None, image=u''):
+    name = alt_name
+    if not name:
+        name = '[B]' + context.localize(constants.localize.WATCH_LATER) + '[/B]'
+        pass
+
+    watch_later_item = DirectoryItem(name,
+                                     context.create_uri([constants.paths.WATCH_LATER, 'list']),
+                                     image=image)
+    watch_later_item.set_fanart(context.get_fanart())
+    return watch_later_item
+
+
 def create_next_page_item(context, current_page):
     new_params = {}
     new_params.update(context.get_params())

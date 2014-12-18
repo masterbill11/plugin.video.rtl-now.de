@@ -13,7 +13,9 @@ class Provider(kodion.AbstractProvider):
     LOCAL_MAP = {'now.library': 30500,
                  'now.newest': 30501,
                  'now.tips': 30502,
-                 'now.top10': 30503}
+                 'now.top10': 30503,
+                 'now.add_to_favs': 30101,
+                 'now.watch_later': 30107}
 
     def __init__(self):
         kodion.AbstractProvider.__init__(self)
@@ -23,7 +25,7 @@ class Provider(kodion.AbstractProvider):
     def get_client(self, context):
         if not self._client:
             amount = context.get_settings().get_items_per_page()
-            server_id = context.get_function_cache().get(FunctionCache.ONE_HOUR*6, Client.get_server_id)
+            server_id = context.get_function_cache().get(FunctionCache.ONE_HOUR * 6, Client.get_server_id)
             self._client = Client(Client.CONFIG_RTL_NOW, amount=amount, server_id=server_id)
             pass
 
@@ -99,7 +101,10 @@ class Provider(kodion.AbstractProvider):
             # plot
             film_item.set_plot(film['articlelong'])
 
-            # TODO: Watch later
+            context_menu = [(context.localize(self.LOCAL_MAP['now.watch_later']),
+                             'RunPlugin(%s)' % context.create_uri([kodion.constants.paths.WATCH_LATER, 'add'],
+                                                                  {'item': kodion.items.to_jsons(film_item)}))]
+            film_item.set_context_menu(context_menu)
             result_films.append(film_item)
             pass
         if sort:
@@ -134,7 +139,7 @@ class Provider(kodion.AbstractProvider):
         result = []
         format_id = re_match.group('format_id')
         page = int(context.get_param('page', 1))
-        json_data = context.get_function_cache().get(FunctionCache.ONE_HOUR/2, self.get_client(context).get_films,
+        json_data = context.get_function_cache().get(FunctionCache.ONE_HOUR / 2, self.get_client(context).get_films,
                                                      format_id=format_id, page=page)
         result.extend(self._list_films(context, re_match, json_data))
 
@@ -143,21 +148,21 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/newest/$')
     def _on_newest(self, context, re_match):
         result = []
-        json_data = context.get_function_cache().get(FunctionCache.ONE_HOUR/2, self.get_client(context).get_newest)
+        json_data = context.get_function_cache().get(FunctionCache.ONE_HOUR / 2, self.get_client(context).get_newest)
         result.extend(self._list_films(context, re_match, json_data, show_format_title=True))
         return result
 
     @kodion.RegisterProviderPath('^/tips/$')
     def _on_tips(self, context, re_match):
         result = []
-        json_data = context.get_function_cache().get(FunctionCache.ONE_HOUR/2, self.get_client(context).get_tips)
+        json_data = context.get_function_cache().get(FunctionCache.ONE_HOUR / 2, self.get_client(context).get_tips)
         result.extend(self._list_films(context, re_match, json_data, show_format_title=True, sort=False))
         return result
 
     @kodion.RegisterProviderPath('^/top10/$')
     def _on_top10(self, context, re_match):
         result = []
-        json_data = context.get_function_cache().get(FunctionCache.ONE_HOUR/2, self.get_client(context).get_top_10)
+        json_data = context.get_function_cache().get(FunctionCache.ONE_HOUR / 2, self.get_client(context).get_top_10)
         result.extend(self._list_films(context, re_match, json_data, show_format_title=True, sort=False))
         return result
 
@@ -190,7 +195,10 @@ class Provider(kodion.AbstractProvider):
                 fanart = re.sub(r'(.*/)(\d+)x(\d+)(/.*)', r'\g<1>768x432\g<4>', fanart)
                 format_item.set_fanart(fanart)
 
-                # TODO: add 'Add to favs' context menu
+                context_menu = [(context.localize(self.LOCAL_MAP['now.add_to_favs']),
+                                 'RunPlugin(%s)' % context.create_uri([kodion.constants.paths.FAVORITES, 'add'],
+                                                                      {'item': kodion.items.to_jsons(format_item)}))]
+                format_item.set_context_menu(context_menu)
                 result.append(format_item)
                 pass
             pass
@@ -222,6 +230,13 @@ class Provider(kodion.AbstractProvider):
             fav_item = kodion.items.create_favorite_item(context)
             fav_item.set_fanart(self.get_fanart(context))
             result.append(fav_item)
+            pass
+
+        # watch later
+        if len(context.get_watch_later_list().list()) > 0:
+            watch_later_item = kodion.items.create_watch_later_item(context)
+            watch_later_item.set_fanart(self.get_fanart(context))
+            result.append(watch_later_item)
             pass
 
         # shows (A-Z)
