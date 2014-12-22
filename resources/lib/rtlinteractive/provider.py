@@ -227,15 +227,13 @@ class Provider(kodion.AbstractProvider):
 
         # favorites
         if len(context.get_favorite_list().list()) > 0:
-            fav_item = kodion.items.create_favorite_item(context)
-            fav_item.set_fanart(self.get_fanart(context))
+            fav_item = kodion.items.FavoritesItem(context, fanart=self.get_fanart(context))
             result.append(fav_item)
             pass
 
         # watch later
         if len(context.get_watch_later_list().list()) > 0:
-            watch_later_item = kodion.items.create_watch_later_item(context)
-            watch_later_item.set_fanart(self.get_fanart(context))
+            watch_later_item = kodion.items.WatchLaterItem(context, fanart=self.get_fanart(context))
             result.append(watch_later_item)
             pass
 
@@ -268,8 +266,7 @@ class Provider(kodion.AbstractProvider):
         result.append(top10_item)
 
         # search
-        search_item = kodion.items.create_search_item(context)
-        search_item.set_fanart(self.get_fanart(context))
+        search_item = kodion.items.SearchItem(context, fanart=self.get_fanart(context))
         result.append(search_item)
 
         return result
