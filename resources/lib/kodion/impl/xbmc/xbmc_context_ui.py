@@ -49,9 +49,19 @@ class XbmcContextUI(AbstractContextUI):
 
         return False, u''
 
-    def on_select(self, title, items=[]):
+    def on_numeric_input(self, title, default=''):
         dialog = xbmcgui.Dialog()
+        result = dialog.input(title, str(default), type=xbmcgui.INPUT_NUMERIC)
+        if result:
+            return True, int(result)
 
+        return False, None
+
+    def on_yes_no_input(self, title, text):
+        dialog = xbmcgui.Dialog()
+        return dialog.yesno(title, text)
+
+    def on_select(self, title, items=[]):
         _dict = {}
         _items = []
         i = 0
@@ -68,6 +78,7 @@ class XbmcContextUI(AbstractContextUI):
             i += 1
             pass
 
+        dialog = xbmcgui.Dialog()
         result = dialog.select(title, _items)
         return _dict.get(result, -1)
 

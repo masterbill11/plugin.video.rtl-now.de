@@ -17,8 +17,10 @@
     <string id="30024">Cache Size (MB)</string>
     <string id="30025">Enable setup-wizard</string>
     <string id="30026">Override View</string>
-    <string id="30027">Default View</string>
-    <string id="30028">View Videos</string>
+    <string id="30027">View: Default</string>
+    <string id="30028">View: Videos</string>
+    <string id="30029">Execute</string>
+    <string id="30030">Setup-wizard</string>
 
     <!-- Kodion Common -->
     <string id="30100">Favorites</string>
