@@ -11,6 +11,17 @@ class ViewManager(object):
             {'name': 'Thumbnail', 'id': 500},
             {'name': 'Media info', 'id': 504},
             {'name': 'Media info 2', 'id': 503}
+        ],
+        'skin.aeon.nox.5': [
+            {'name': 'List', 'id': 50},
+            {'name': 'Episodes', 'id': 502},
+            {'name': 'LowList', 'id': 501},
+            {'name': 'BannerWall', 'id': 58},
+            {'name': 'Shift', 'id': 57},
+            {'name': 'Posters', 'id': 56},
+            {'name': 'ShowCase', 'id': 53},
+            {'name': 'Landscape', 'id': 52},
+            {'name': 'InfoWall', 'id': 51},
         ]
     }
 
@@ -22,13 +33,17 @@ class ViewManager(object):
         view_id = -1
         settings = self._context.get_settings()
 
-        skin_data = self.SKIN_DATA.get(self._context.get_ui().get_skin_id(), [])
+        skin_id = self._context.get_ui().get_skin_id()
+        skin_data = self.SKIN_DATA.get(skin_id, [])
         if skin_data:
             items = []
             for view_data in skin_data:
                 items.append((view_data['name'], view_data['id']))
                 pass
             view_id = self._context.get_ui().on_select(title, items)
+            pass
+        else:
+            self._context.log("ViewManager: Unknown skin id '%s'" % skin_id)
             pass
 
         if view_id == -1:

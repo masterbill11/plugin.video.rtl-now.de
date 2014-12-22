@@ -31,6 +31,8 @@ class Provider(kodion.AbstractProvider):
         return self._client
 
     def _list_films(self, context, re_match, json_data, show_format_title=False, sort=True):
+        context.get_ui().set_view_mode('videos')
+
         def _sort_newest(item):
             return item.get_aired()
 
@@ -135,8 +137,6 @@ class Provider(kodion.AbstractProvider):
 
     @kodion.RegisterProviderPath('^/format/(?P<format_id>\d+)/$')
     def _on_format(self, context, re_match):
-        context.get_ui().set_view_mode('videos')
-
         result = []
         format_id = re_match.group('format_id')
         page = int(context.get_param('page', 1))
