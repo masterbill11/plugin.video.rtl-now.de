@@ -115,8 +115,7 @@ class Provider(kodion.AbstractProvider):
             new_params = {}
             new_params.update(context.get_params())
             new_params['page'] = page + 1
-            next_page_item = kodion.items.create_next_page_item(context, page)
-            next_page_item.set_fanart(self.get_fanart(context))
+            next_page_item = kodion.items.NextPageItem(context, current_page=page, fanart=self.get_fanart(context))
             result.append(next_page_item)
             pass
 

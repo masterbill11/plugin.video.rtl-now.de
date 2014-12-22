@@ -9,20 +9,6 @@ from .audio_item import AudioItem
 from .image_item import ImageItem
 
 
-def create_next_page_item(context, current_page):
-    new_params = {}
-    new_params.update(context.get_params())
-    new_params['page'] = unicode(current_page + 1)
-    name = context.localize(constants.localize.NEXT_PAGE, 'Next Page')
-    if name.find('%d') != -1:
-        name %= current_page + 1
-        pass
-
-    next_page_item = DirectoryItem(name, context.create_uri(context.get_path(), new_params))
-    next_page_item.set_fanart(context.get_fanart())
-    return next_page_item
-
-
 def from_json(json_data):
     """
     Creates a instance of the given json dump or dict.
