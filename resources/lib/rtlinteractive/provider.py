@@ -70,7 +70,7 @@ class Provider(kodion.AbstractProvider):
 
             # set image
             image = film['biggalerieimg']
-            image = re.sub(r'(.*/)(\d+)x(\d+)(/.*)', r'\g<1>500x281\g<4>', image)
+            image = re.sub(r'(.+/)(\d+)x(\d+)(/.+)', r'\g<1>500x281\g<4>', image)
             pictures = film.get('pictures', [])
             if pictures and isinstance(pictures, dict):
                 image = film['pictures']['pic_0']
@@ -80,7 +80,7 @@ class Provider(kodion.AbstractProvider):
 
             # set fanart
             fanart = film['bigaufmacherimg']
-            fanart = re.sub(r'(.*/)(\d+)x(\d+)(/.*)', r'\g<1>768x432\g<4>', fanart)
+            fanart = re.sub(r'(.+/)(\d+)x(\d+)(/.+)', r'\g<1>768x432\g<4>', fanart)
             film_item.set_fanart(fanart)
 
             # season and episode
@@ -187,12 +187,12 @@ class Provider(kodion.AbstractProvider):
 
                 # set image
                 image = now_format['biggalerieimg']
-                image = re.sub(r'(.*/)(\d+)x(\d+)(/.*)', r'\g<1>500x281\g<4>', image)
+                image = re.sub(r'(.+/)(\d+)x(\d+)(/.+)', r'\g<1>500x281\g<4>', image)
                 format_item.set_image(image)
 
                 # set fanart
                 fanart = now_format['bigaufmacherimg']
-                fanart = re.sub(r'(.*/)(\d+)x(\d+)(/.*)', r'\g<1>768x432\g<4>', fanart)
+                fanart = re.sub(r'(.+/)(\d+)x(\d+)(/.+)', r'\g<1>768x432\g<4>', fanart)
                 format_item.set_fanart(fanart)
 
                 context_menu = [(context.localize(self.LOCAL_MAP['now.add_to_favs']),
