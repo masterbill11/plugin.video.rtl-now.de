@@ -49,7 +49,7 @@ class AbstractProvider(object):
 
     def navigate(self, context):
         # start the setup wizard
-        if context.get_settings().is_setup_wizard():
+        if context.get_settings().is_setup_wizard_enabled():
             context.get_settings().set_bool(constants.setting.SETUP_WIZARD, False)
             self.on_setup_wizard(context)
             pass
