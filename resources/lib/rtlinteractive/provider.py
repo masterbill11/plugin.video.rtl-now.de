@@ -22,6 +22,9 @@ class Provider(kodion.AbstractProvider):
         self._client = None
         pass
 
+    def get_wizard_supported_views(self):
+        return ['default', 'episodes']
+
     def get_client(self, context):
         if not self._client:
             amount = context.get_settings().get_items_per_page()

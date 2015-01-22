@@ -1,3 +1,6 @@
+2.0.8~beta1 (2015-01-22)
+UPD: test simple_requests implementation
+
 2.0.7 (2014-12-22)
 ADD: view mode wizard (kodion)
 
