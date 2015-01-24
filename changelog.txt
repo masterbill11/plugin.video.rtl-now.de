@@ -1,3 +1,6 @@
+2.0.8~beta2 (2015-01-24)
+UPD: Kodion with UriItem
+
 2.0.8~beta1 (2015-01-22)
 UPD: test simple_requests implementation
 

@@ -4,7 +4,7 @@ from resources.lib.kodion.utils import FunctionCache
 __author__ = 'bromix'
 
 from resources.lib import kodion
-from resources.lib.kodion.items import DirectoryItem, VideoItem
+from resources.lib.kodion.items import DirectoryItem, VideoItem, UriItem
 from resources.lib.kodion import iso8601
 from .client import Client
 
@@ -132,9 +132,8 @@ class Provider(kodion.AbstractProvider):
         if video_id:
             server_id = context.get_function_cache().get(FunctionCache.ONE_HOUR * 6, Client.get_server_id)
             streams = self.get_client(context).get_film_streams(video_id, server_id=server_id)
-            video_item = VideoItem(video_id,
-                                   streams[0])
-            return video_item
+            uri_item = UriItem(streams[0])
+            return uri_item
 
         return False
 
