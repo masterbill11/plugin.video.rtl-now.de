@@ -154,16 +154,14 @@ class Client(object):
                 hds_match = re.search(r'http://hds.+/(?P<play_path>\d+/.+)', filename.text)
                 if rtmpe_match:
                     play_path = 'mp4:' + rtmpe_match.group('play_path')
-                    #url = '%s playpath=%s swfVfy=1 swfUrl=%s pageUrl=%s' % (
-                    url = '%s playpath=%s swfUrl=%s pageUrl=%s' % (
+                    url = '%s playpath=%s swfVfy=1 swfUrl=%s pageUrl=%s' % (
                         filename.text, play_path, player_url, video_url)
                     result.append(url)
                     pass
                 elif hds_match:
                     play_path = hds_match.group('play_path').replace('.f4m', '')
                     rtmpe = self._config['rtmpe'] % server_id
-                    #url = '%s%s playpath=%s swfVfy=1 swfUrl=%s pageUrl=%s' % (rtmpe, play_path, 'mp4:'+play_path, player_url, video_url)
-                    url = '%s%s playpath=%s swfUrl=%s pageUrl=%s' % (rtmpe, play_path, 'mp4:'+play_path, player_url, video_url)
+                    url = '%s%s playpath=%s swfVfy=1 swfUrl=%s pageUrl=%s' % (rtmpe, play_path, 'mp4:'+play_path, player_url, video_url)
                     result.append(url)
                     pass
                 else:
