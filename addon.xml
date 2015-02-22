@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.bromix.rtl_now" name="RTL NOW" version="2.0.11" provider-name="bromix">
+<addon id="plugin.video.de.rtl-now" name="RTL NOW" version="2.1.0~beta1" provider-name="bromix">
 	<requires>
 		<import addon="xbmc.python" version="2.14.0"/>
 	</requires>
@@ -18,6 +18,6 @@
 		<forum></forum>
 		<website>http://rtl-now.rtl.de</website>
 		<email>bromix at gmx dot net</email>
-		<source>https://github.com/bromix/plugin.video.bromix.rtl_now</source>
+		<source>https://github.com/bromix/plugin.video.de.rtl-now</source>
 	</extension>
 </addon>
