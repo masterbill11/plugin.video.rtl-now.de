@@ -16,8 +16,8 @@
 		<platform>all</platform>
 		<license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
 		<forum></forum>
-		<website>http://rtl-now.rtl.de</website>
+		<website>http://rtl-now.de</website>
 		<email>bromix at gmx dot net</email>
-		<source>https://github.com/bromix/plugin.video.de.rtl-now</source>
+		<source>https://github.com/bromix/plugin.video.rtl-now.de</source>
 	</extension>
 </addon>
