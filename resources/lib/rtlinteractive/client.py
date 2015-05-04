@@ -59,9 +59,9 @@ class Client(object):
                           'search'
                       ],
                       'images': {
-                          'episode-thumbnail-url': 'http://autoimg.rtl.de/ntvnow/%PIC_ID%/660x660/formatimage.jpg',
-                          'format-thumbnail-url': 'http://autoimg.rtl.de/ntvnow/%FORMAT_ID%-default_image_169_logo/500x281/8b6ba.jpg',
-                          'format-fanart-url': 'http://autoimg.rtl.de/ntvnow/%FORMAT_ID%-default_image_169_format/768x432/8b6ba.jpg'
+                          'episode-thumbnail-url': 'http://autoimg.rtl.de/rtlnow/%PIC_ID%/660x660/formatimage.jpg',
+                          'format-thumbnail-url': 'http://autoimg.rtl.de/rtlnow/%FORMAT_ID%-default_image_169_logo/500x281/8b6ba.jpg',
+                          'format-fanart-url': 'http://autoimg.rtl.de/rtlnow/%FORMAT_ID%-default_image_169_format/768x432/8b6ba.jpg'
                       },
                       'http-header': {'X-App-Name': 'RTL NOW App',
                                       'X-Device-Type': 'rtlnow_android',
