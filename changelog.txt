@@ -1,3 +1,9 @@
+3.0.0 (2015-05-05)
+ADD: provide additional information (the name of the TV Show - e.g. Exclusiv, or RTL Aktuell)
+UPD: improved stream extraction
+UPD: moved to Helix because of playback
+FIX: url for thumbs and fanart was not correct
+
 2.2.3 (2015-05-03)
 FIX: playback
 

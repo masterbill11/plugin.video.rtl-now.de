@@ -64,12 +64,15 @@ class Provider(kodion.AbstractProvider):
                 continue
 
             title = film['headlinelong']
+            format_title = film['formatlong']
             if show_format_title:
-                format_title = film['formatlong']
                 title = format_title + ' - ' + title
                 pass
 
             film_item = VideoItem(title, context.create_uri(['play'], {'video_id': film['id']}))
+
+            film_item.set_studio(format_title)
+            film_item.add_artist(format_title)
 
             format_id = film['formatid']
             # set image
@@ -129,9 +132,8 @@ class Provider(kodion.AbstractProvider):
     def _on_play(self, context, re_match):
         video_id = context.get_param('video_id', '')
         if video_id:
-            server_id = context.get_function_cache().get(FunctionCache.ONE_HOUR * 6, Client.get_server_id)
             try:
-                streams = self.get_client(context).get_film_streams(video_id, server_id=server_id)
+                streams = self.get_client(context).get_film_streams(video_id)
             except UnsupportedStreamException, ex:
                 context.get_ui().show_notification(context.localize(self._local_map['now.exception.drm_not_supported']))
                 return False

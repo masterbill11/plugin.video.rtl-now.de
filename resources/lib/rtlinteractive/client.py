@@ -127,36 +127,10 @@ class Client(object):
         self._amount = amount
         pass
 
-    @staticmethod
-    def get_server_id():
-        client = Client(Client.CONFIG_RTL_NOW)
-        json_data = client.get_films(2)
-        film_list = json_data.get('result', {}).get('content', {}).get('filmlist', {})
-        film_id = None
-        for key in film_list:
-            film = film_list[key]
-            if int(film.get('free', 1)) == 1:
-                film_id = film['id']
-                break
-            pass
-
-        if film_id is not None:
-            streams = client.get_film_streams(film_id)
-            if streams:
-                stream = streams[0]
-                re_match = re.search(r'rtmpe://fms-fra(?P<server_id>\d+).*', stream)
-                if re_match:
-                    server_id = int(re_match.group('server_id'))
-                    return server_id
-                pass
-            pass
-
-        return 22
-
     def get_config(self):
         return self._config
 
-    def get_film_streams(self, film_id, server_id=22):
+    def get_film_streams(self, film_id):
         result = []
 
         def _browse(_url):
@@ -165,7 +139,7 @@ class Client(object):
                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.38 Safari/537.36',
                        'DNT': '1',
-                       'Accept-Encoding': 'gzip, deflate, sdch',
+                       'Accept-Encoding': 'gzip',
                        'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
 
             _result = requests.get(_url, headers=headers, verify=False)
@@ -223,16 +197,15 @@ class Client(object):
             try:
                 _xml = ElementTree.fromstring(_result.text)
                 _url = ''
-                _last_bitrate = 0
+                _last_bit_rate = 0
                 for _media in _xml:
-                    _bitrate = int(_media.get('bitrate'))
-                    if _bitrate > _last_bitrate:
+                    _bit_rate = int(_media.get('bitrate'))
+                    if _bit_rate > _last_bit_rate:
                         _url = _media.get('href')
-                        _last_bitrate = _bitrate
+                        _last_bit_rate = _bit_rate
                         pass
                     pass
                 if _url:
-                    _url = _url.replace('hds', 'hls').replace('f4m', 'm3u8')
                     return _url
             except:
                 raise UnsupportedStreamException
@@ -252,36 +225,43 @@ class Client(object):
             video_info = xml.find('./playlist/videoinfo')
             for filename in video_info.findall('filename'):
                 # FlashAccess DRM protection isn't supported yet
-                metadaten = filename.get('metadaten')
-                headerdaten = filename.get('headerdaten')
-                if metadaten and headerdaten:
+                meta_daten = filename.get('metadaten')
+                header_daten = filename.get('headerdaten')
+                if meta_daten and header_daten:
                     raise UnsupportedStreamException
 
-                # No support for HDS MANIFEST
-                if (re.search(r'http://.+/hds/.+/\d+/manifest-hds.f4m', filename.text)):
-                    url = _process_manifest(filename.text)
-                    if url:
-                        result.append(url)
-                        pass
-                    return result
+                filename_text = filename.text
 
-                rtmpe_match = re.search(r'(?P<url>rtmpe://(?:[^/]+/){2})(?P<play_path>.+)', filename.text)
-                hds_match = re.search(r'http://hds.+/(?P<play_path>\d+/.+)', filename.text)
+                """
+                From *.manifest-hsd.f4m we extract the url with the highest bitrate
+                """
+                if re.search(r'http://.+/hds/.+/\d+/manifest-hds.f4m', filename_text):
+                    filename_text = _process_manifest(filename.text)
+                    pass
+
+                rtmpe_match = re.search(r'(?P<url>rtmpe://(?:[^/]+/){2})(?P<play_path>.+)', filename_text)
                 if rtmpe_match:
                     play_path = 'mp4:' + rtmpe_match.group('play_path')
                     url = '%s playpath=%s swfVfy=1 swfUrl=%s pageUrl=%s' % (
                         filename.text, play_path, player_url, video_url)
                     result.append(url)
-                    pass
-                elif hds_match:
+                    continue
+
+                hds_match = re.search(r'http://hds.+/(?P<play_path>\d+/.+)', filename_text)
+                if hds_match:
+                    url = filename_text.replace('hds', 'hls').replace('f4m', 'm3u8')
+
+                    """
                     play_path = hds_match.group('play_path').replace('.f4m', '')
                     rtmpe = self._config['rtmpe'] % server_id
                     url = '%s%s playpath=%s swfVfy=1 swfUrl=%s pageUrl=%s' % (
                         rtmpe, play_path, 'mp4:' + play_path, player_url, video_url)
+                    """
                     result.append(url)
-                    pass
-                else:
-                    result.append(filename.text)
+                    continue
+
+                # fallback
+                result.append(filename.text)
                 pass
             pass
 
