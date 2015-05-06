@@ -26,6 +26,7 @@ class Client(object):
                       'id': '49',
                       'rtmpe': 'rtmpe://fms-fra%d.rtl.de/ntvnow/',
                       'hds': 'http://hds.fra.rtlnow.de/hds-vod-enc/ntvnow/videos/%s.m3u8',
+                      'manifest_f4m': 'http://www.n-tvnow.de/hds/videos/%s/manifest-hds.f4m',
                       'supports': [
                           'library',
                           # 'new',
@@ -53,7 +54,7 @@ class Client(object):
                       'id': '9',
                       'rtmpe': 'rtmpe://fms-fra%d.rtl.de/rtlnow/',
                       'hds': 'http://hds.fra.rtlnow.de/hds-vod-enc/rtlnow/videos/%s.m3u8',
-                      'manifest_f4m': 'https://rtlnow.de/hds/videos/%s/manifest-hds.f4m',
+                      'manifest_f4m': 'http://rtlnow.de/hds/videos/%s/manifest-hds.f4m',
                       'supports': [
                           'library',
                           'new',
@@ -81,7 +82,7 @@ class Client(object):
                        'id': '37',
                        'rtmpe': 'rtmpe://fms-fra%d.rtl.de/rtl2now/',
                        'hds': 'http://hds.fra.rtl2now.de/hds-vod-enc/rtl2now/videos/%s.m3u8',
-                       'manifest_f4m': 'https://rtl2now.rtl2.de/hds/videos/%s/manifest-hds.f4m',
+                       'manifest_f4m': 'http://rtl2now.rtl2.de/hds/videos/%s/manifest-hds.f4m',
                        'supports': [
                            'library',
                            'new',
@@ -109,6 +110,7 @@ class Client(object):
                       'id': '41',
                       'rtmpe': 'rtmpe://fms-fra%d.rtl.de/voxnow/',
                       'hds': 'http://hds.fra.rtlnow.de/hds-vod-enc/voxnow/videos/%s.m3u8',
+                      'manifest_f4m': 'http://voxnow.de/hds/videos/%s/manifest-hds.f4m',
                       'supports': [
                           'library',
                           'new',
@@ -237,13 +239,23 @@ class Client(object):
 
             return _url
 
-        # first test manifest *.f4m
+        """
+        First test manifest *.f4m
+        This is the fastest way and allows us to play US TV shows.
+        """
         manifest_url = self._config['manifest_f4m'] % str(film_id)
-        video_url = _process_manifest(manifest_url)
-        video_url = _normalize_url(video_url)
-        if video_url:
-            return [video_url]
+        try:
+            video_url = _process_manifest(manifest_url)
+            if video_url:
+                video_url = _normalize_url(video_url)
+                return [video_url]
+        except:
+            # do nothing and let the fallback happen :)
+            pass
 
+        """
+        Fallback
+        """
         json_data = self.get_film_details(film_id)
         film = json_data.get('result', {}).get('content', {}).get('film', {})
         video_url = str(film.get('videourl', ''))
