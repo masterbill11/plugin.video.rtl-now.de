@@ -1,3 +1,6 @@
+3.0.1 (2015-05-05)
+UPD: improved playback - transform all urls to HLS urls
+
 3.0.0 (2015-05-05)
 ADD: provide additional information (the name of the TV Show - e.g. Exclusiv, or RTL Aktuell)
 UPD: improved stream extraction

@@ -25,6 +25,7 @@ class Client(object):
                       'url': 'https://www.n-tvnow.de/',
                       'id': '49',
                       'rtmpe': 'rtmpe://fms-fra%d.rtl.de/ntvnow/',
+                      'hds': 'http://hds.fra.rtlnow.de/hds-vod-enc/ntvnow/videos/%s.m3u8',
                       'supports': [
                           'library',
                           # 'new',
@@ -51,6 +52,7 @@ class Client(object):
                       'url': 'https://rtl-now.rtl.de/',
                       'id': '9',
                       'rtmpe': 'rtmpe://fms-fra%d.rtl.de/rtlnow/',
+                      'hds': 'http://hds.fra.rtlnow.de/hds-vod-enc/rtlnow/videos/%s.m3u8',
                       'supports': [
                           'library',
                           'new',
@@ -77,6 +79,7 @@ class Client(object):
                        'url': 'https://rtl2now.rtl2.de/',
                        'id': '37',
                        'rtmpe': 'rtmpe://fms-fra%d.rtl.de/rtl2now/',
+                       'hds': 'http://hds.fra.rtlnow.de/hds-vod-enc/rtl2now/videos/%s.m3u8',
                        'supports': [
                            'library',
                            'new',
@@ -103,6 +106,7 @@ class Client(object):
                       'url': 'https://www.voxnow.de/',
                       'id': '41',
                       'rtmpe': 'rtmpe://fms-fra%d.rtl.de/voxnow/',
+                      'hds': 'http://hds.fra.rtlnow.de/hds-vod-enc/voxnow/videos/%s.m3u8',
                       'supports': [
                           'library',
                           'new',
@@ -239,24 +243,20 @@ class Client(object):
                     filename_text = _process_manifest(filename.text)
                     pass
 
+                """
+                Transform rtmpe urls to hds urls
+                """
                 rtmpe_match = re.search(r'(?P<url>rtmpe://(?:[^/]+/){2})(?P<play_path>.+)', filename_text)
                 if rtmpe_match:
-                    play_path = 'mp4:' + rtmpe_match.group('play_path')
-                    url = '%s playpath=%s swfVfy=1 swfUrl=%s pageUrl=%s' % (
-                        filename.text, play_path, player_url, video_url)
-                    result.append(url)
-                    continue
+                    filename_text =  self._config['hds'] % rtmpe_match.group('play_path')
+                    pass
 
+                """
+                Transform hds urls to hls urls
+                """
                 hds_match = re.search(r'http://hds.+/(?P<play_path>\d+/.+)', filename_text)
                 if hds_match:
                     url = filename_text.replace('hds', 'hls').replace('f4m', 'm3u8')
-
-                    """
-                    play_path = hds_match.group('play_path').replace('.f4m', '')
-                    rtmpe = self._config['rtmpe'] % server_id
-                    url = '%s%s playpath=%s swfVfy=1 swfUrl=%s pageUrl=%s' % (
-                        rtmpe, play_path, 'mp4:' + play_path, player_url, video_url)
-                    """
                     result.append(url)
                     continue
 

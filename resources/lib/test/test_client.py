@@ -7,7 +7,7 @@ from resources.lib import rtlinteractive
 class TestClient(unittest.TestCase):
     def test_get_film_streams(self):
         client = rtlinteractive.Client(rtlinteractive.Client.CONFIG_RTL_NOW)
-        streams = client.get_film_streams(200875)
+        streams = client.get_film_streams(201205)
         pass
 
     def test_get_film_details(self):
