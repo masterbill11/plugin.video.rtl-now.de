@@ -53,6 +53,7 @@ class Client(object):
                       'id': '9',
                       'rtmpe': 'rtmpe://fms-fra%d.rtl.de/rtlnow/',
                       'hds': 'http://hds.fra.rtlnow.de/hds-vod-enc/rtlnow/videos/%s.m3u8',
+                      'manifest_f4m': 'https://rtlnow.de/hds/videos/%s/manifest-hds.f4m',
                       'supports': [
                           'library',
                           'new',
@@ -79,7 +80,8 @@ class Client(object):
                        'url': 'https://rtl2now.rtl2.de/',
                        'id': '37',
                        'rtmpe': 'rtmpe://fms-fra%d.rtl.de/rtl2now/',
-                       'hds': 'http://hds.fra.rtlnow.de/hds-vod-enc/rtl2now/videos/%s.m3u8',
+                       'hds': 'http://hds.fra.rtl2now.de/hds-vod-enc/rtl2now/videos/%s.m3u8',
+                       'manifest_f4m': 'https://rtl2now.rtl2.de/hds/videos/%s/manifest-hds.f4m',
                        'supports': [
                            'library',
                            'new',
@@ -189,7 +191,8 @@ class Client(object):
             return player_data_url, player_url
 
         def _process_manifest(_url):
-            headers = {'Connection': 'keep-alive',
+            try:
+                headers = {'Connection': 'keep-alive',
                        'Cache-Control': 'max-age=0',
                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.38 Safari/537.36',
@@ -197,8 +200,8 @@ class Client(object):
                        'Accept-Encoding': 'gzip, deflate, sdch',
                        'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
 
-            _result = requests.get(_url, headers=headers, verify=False)
-            try:
+                _result = requests.get(_url, headers=headers, verify=False)
+
                 _xml = ElementTree.fromstring(_result.text)
                 _url = ''
                 _last_bit_rate = 0
@@ -214,6 +217,32 @@ class Client(object):
             except:
                 raise UnsupportedStreamException
             pass
+
+        def _normalize_url(_url):
+            """
+            Transform rtmpe urls to hds urls
+            """
+            rtmpe_match = re.search(r'(?P<url>rtmpe://(?:[^/]+/){2})(?P<play_path>.+)', _url)
+            if rtmpe_match:
+                _url = self._config['hds'] % rtmpe_match.group('play_path')
+                pass
+
+            """
+            Transform hds urls to hls urls
+            """
+            hds_match = re.search(r'http://hds.+/(?P<play_path>\d+/.+)', _url)
+            if hds_match:
+                _url = _url.replace('hds', 'hls').replace('f4m', 'm3u8')
+                pass
+
+            return _url
+
+        # first test manifest *.f4m
+        manifest_url = self._config['manifest_f4m'] % str(film_id)
+        video_url = _process_manifest(manifest_url)
+        video_url = _normalize_url(video_url)
+        if video_url:
+            return [video_url]
 
         json_data = self.get_film_details(film_id)
         film = json_data.get('result', {}).get('content', {}).get('film', {})
@@ -243,25 +272,9 @@ class Client(object):
                     filename_text = _process_manifest(filename.text)
                     pass
 
-                """
-                Transform rtmpe urls to hds urls
-                """
-                rtmpe_match = re.search(r'(?P<url>rtmpe://(?:[^/]+/){2})(?P<play_path>.+)', filename_text)
-                if rtmpe_match:
-                    filename_text =  self._config['hds'] % rtmpe_match.group('play_path')
-                    pass
+                filename_text = _normalize_url(filename_text)
 
-                """
-                Transform hds urls to hls urls
-                """
-                hds_match = re.search(r'http://hds.+/(?P<play_path>\d+/.+)', filename_text)
-                if hds_match:
-                    url = filename_text.replace('hds', 'hls').replace('f4m', 'm3u8')
-                    result.append(url)
-                    continue
-
-                # fallback
-                result.append(filename.text)
+                result.append(filename_text)
                 pass
             pass
 
